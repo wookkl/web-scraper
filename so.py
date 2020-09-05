@@ -15,13 +15,22 @@ def get_last_page():
 def extract_job(html):
     title = html.find("h2").text.strip()
     company, location = html.find("h3").find_all("span", recursive=False)
-    print("COMPANY :  "+company.get_text(strip=True) +
-          " LOCATION : " + location.get_text(strip=True))
+    company = company.get_text(strip=True)
+    location = location.get_text(strip=True)
+    job_id = html['data-jobid']
+
+    return {
+        'title': title,
+        'company': company,
+        'location': location,
+        'link': f"https://stackoverflow.com/jobs/{job_id}"
+    }
 
 
 def extract_jobs(last_page):
     jobs = []
     for page in range(1, last_page+1):
+        print(f"Scrapping SO: Page {page}")
         result = requests.get(f"{URL}&pg={page}")
         soup = BeautifulSoup(result.text, "html.parser")
         results = soup.find_all("div", {"class": "-job"})
